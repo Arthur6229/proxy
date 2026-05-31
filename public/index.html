@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TON 618</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23050301'/><circle cx='50' cy='50' r='22' fill='%23000'/><ellipse cx='50' cy='50' rx='48' ry='11' fill='none' stroke='%23c8813f' stroke-width='4' opacity='.9'/></svg>" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber:   #c8813f;
+      --gold:    #e8a84a;
+      --void:    #050301;
+      --text:    #f0e6d3;
+      --muted:   rgba(240,230,211,.55);
+      --border:  rgba(200,129,63,.32);
+      --glow:    rgba(200,129,63,.22);
+      --glass:   rgba(5,3,1,.62);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      color: var(--text);
+      background: var(--void);
+      overflow-x: hidden;
+    }
+
+    /* ── Background ── */
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background: url('/bg.png') center/cover no-repeat;
+    }
+    .bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 70% at 42% 48%, rgba(5,3,1,.38) 0%, rgba(5,3,1,.72) 70%, rgba(5,3,1,.92) 100%);
+    }
+
+    /* ── Layout ── */
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 36px;
+      border-bottom: 1px solid rgba(200,129,63,.12);
+      background: rgba(5,3,1,.4);
+      backdrop-filter: blur(8px);
+    }
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none; color: inherit;
+    }
+    .logo-ring {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, #1a0e06 0%, #000 55%);
+      border: 2px solid var(--amber);
+      box-shadow: 0 0 16px var(--glow), inset 0 0 8px rgba(200,129,63,.2);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .logo-ring::after {
+      content: '';
+      position: absolute; inset: -6px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(200,129,63,.25);
+    }
+    .logo-text {
+      font-size: 17px; font-weight: 800;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--text);
+    }
+    .logo-text span { color: var(--amber); }
+    .nav-link {
+      font-size: 12px; font-weight: 600; letter-spacing: .08em;
+      color: var(--muted); text-decoration: none;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-link:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    main {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 24px 40px;
+      gap: 0;
+    }
+
+    .eyebrow {
+      font-size: 11px; font-weight: 700; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--amber);
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .eyebrow::before, .eyebrow::after {
+      content: '';
+      height: 1px; width: 40px;
+      background: linear-gradient(90deg, transparent, var(--amber));
+    }
+    .eyebrow::after { transform: scaleX(-1); }
+
+    h1 {
+      font-size: clamp(56px, 12vw, 112px);
+      font-weight: 900; letter-spacing: .04em;
+      line-height: 1;
+      background: linear-gradient(160deg, #fff 10%, var(--gold) 55%, var(--amber) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .tagline {
+      font-size: clamp(13px, 2vw, 16px);
+      color: var(--muted);
+      letter-spacing: .04em;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    /* ── Stats row ── */
+    .stats {
+      display: flex; gap: 28px; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 48px;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-val {
+      font-size: 20px; font-weight: 800; color: var(--gold);
+      letter-spacing: .02em;
+    }
+    .stat-label {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .12em; color: var(--muted); margin-top: 2px;
+    }
+    .stat-sep {
+      width: 1px; background: var(--border);
+      align-self: stretch; margin: 4px 0;
+    }
+
+    /* ── Search form ── */
+    .search-wrap {
+      width: 100%; max-width: 600px;
+      position: relative;
+    }
+
+    .search-ring {
+      position: absolute; inset: -1.5px;
+      border-radius: 17px;
+      background: linear-gradient(135deg, rgba(200,129,63,.6), rgba(200,129,63,.15), rgba(200,129,63,.5));
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+    .search-wrap:focus-within .search-ring { opacity: 1; }
+
+    .search-box {
+      position: relative;
+      display: flex; align-items: center;
+      background: rgba(10,6,3,.75);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .search-wrap:focus-within .search-box {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 4px rgba(200,129,63,.12), 0 8px 40px rgba(0,0,0,.5);
+    }
+
+    .search-icon {
+      padding: 0 0 0 20px; flex-shrink: 0;
+      opacity: .5;
+    }
+
+    #search-input {
+      flex: 1;
+      background: none; border: none; outline: none;
+      padding: 18px 16px;
+      font-size: 15px; color: var(--text);
+      font-family: inherit;
+      min-width: 0;
+    }
+    #search-input::placeholder { color: rgba(240,230,211,.35); }
+
+    #search-btn {
+      margin: 6px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--amber), #a0622a);
+      border: none; border-radius: 11px;
+      color: #fff; font-size: 14px; font-weight: 700;
+      cursor: pointer; flex-shrink: 0;
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 2px 12px rgba(200,129,63,.35);
+    }
+    #search-btn:hover {
+      opacity: .9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(200,129,63,.45);
+    }
+    #search-btn:active { transform: translateY(0); }
+
+    .search-hint {
+      text-align: center; margin-top: 12px;
+      font-size: 12px; color: rgba(240,230,211,.3);
+      letter-spacing: .04em;
+    }
+    .search-hint kbd {
+      font-family: inherit;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 4px; padding: 1px 5px;
+      font-size: 11px;
+    }
+
+    /* ── Status bar ── */
+    #status {
+      margin-top: 20px;
+      font-size: 12px; color: var(--muted);
+      min-height: 18px;
+      transition: color .3s;
+    }
+    #status.err { color: #e87050; }
+    #status.ok  { color: #70c080; }
+
+    /* ── Features ── */
+    .features {
+      display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+      margin-top: 52px; max-width: 600px;
+    }
+    .feat {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; letter-spacing: .07em;
+      text-transform: uppercase; color: rgba(240,230,211,.4);
+    }
+    .feat-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--amber); flex-shrink: 0;
+      box-shadow: 0 0 6px var(--amber);
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 20px 24px;
+      font-size: 12px; color: rgba(240,230,211,.22);
+      letter-spacing: .05em; border-top: 1px solid rgba(200,129,63,.07);
+    }
+    footer a { color: var(--amber); text-decoration: none; opacity: .7; }
+    footer a:hover { opacity: 1; }
+
+    /* ── Error overlay ── */
+    #err-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(5,3,1,.85); backdrop-filter: blur(12px);
+      align-items: center; justify-content: center;
+    }
+    #err-overlay.show { display: flex; }
+    .err-card {
+      background: rgba(15,8,4,.9);
+      border: 1px solid rgba(200,129,63,.25);
+      border-radius: 20px; padding: 36px 40px;
+      max-width: 400px; text-align: center;
+    }
+    .err-card h2 { font-size: 18px; margin-bottom: 10px; color: #e87050; }
+    .err-card p  { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    .err-card button {
+      padding: 10px 24px; background: var(--amber); border: none;
+      border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+
+  <div class="page">
+    <nav>
+      <a href="/" class="logo">
+        <div class="logo-ring"></div>
+        <span class="logo-text">TON <span>618</span></span>
+      </a>
+      <a href="https://usternium.com" class="nav-link" target="_blank" rel="noopener">Usternium ↗</a>
+    </nav>
+
+    <main>
+      <div class="eyebrow">Beyond the Event Horizon</div>
+
+      <h1>TON 618</h1>
+
+      <p class="tagline">The largest known black hole · 66 billion solar masses · 3.8 billion light-years away</p>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-val">66B M☉</div>
+          <div class="stat-label">Solar Masses</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat">
+          <div class="stat-val">3.8 Gly</div>
+          <div class="stat-label">Distance</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat">
+          <div class="stat-val">1,300 AU</div>
+          <div class="stat-label">Event Horizon</div>
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <div class="search-ring"></div>
+        <div class="search-box">
+          <div class="search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+          <input
+            id="search-input"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Enter a URL or search query…"
+            autofocus
+          />
+          <button id="search-btn" type="button">Go&nbsp;→</button>
+        </div>
+        <p class="search-hint">Press <kbd>Enter</kbd> to navigate · Searches use Google</p>
+      </div>
+
+      <div id="status"></div>
+
+      <div class="features">
+        <div class="feat"><div class="feat-dot"></div> Anonymous</div>
+        <div class="feat"><div class="feat-dot"></div> Encrypted</div>
+        <div class="feat"><div class="feat-dot"></div> No Logs</div>
+        <div class="feat"><div class="feat-dot"></div> Fast</div>
+      </div>
+    </main>
+
+    <footer>
+      A <a href="https://usternium.com" target="_blank" rel="noopener">Usternium</a> project &nbsp;·&nbsp;
+      TON 618 is a hyperluminous quasar located 10.4 billion light-years away &nbsp;·&nbsp; © 2026
+    </footer>
+  </div>
+
+  <!-- No-SW fallback overlay -->
+  <div id="err-overlay">
+    <div class="err-card">
+      <h2>Service Worker Required</h2>
+      <p>This proxy requires a service worker to intercept requests. Make sure you're using Chrome, Edge, or a modern browser with service worker support enabled.</p>
+      <button onclick="document.getElementById('err-overlay').classList.remove('show')">Dismiss</button>
+    </div>
+  </div>
+
+  <script src="/uv/uv.bundle.js"></script>
+  <script src="/uv/uv.config.js"></script>
+  <script type="module">
+    import { BareMuxConnection } from '/baremux/index.mjs';
+
+    const status = document.getElementById('status');
+    const input  = document.getElementById('search-input');
+
+    function setStatus(msg, type = '') {
+      status.textContent = msg;
+      status.className   = type;
+    }
+
+    function resolveUrl(raw) {
+      raw = raw.trim();
+      if (!raw) return null;
+      try { return new URL(raw).href; } catch {}
+      if (!raw.includes(' ') && raw.includes('.')) {
+        try { return new URL('https://' + raw).href; } catch {}
+      }
+      return 'https://www.google.com/search?q=' + encodeURIComponent(raw);
+    }
+
+    function navigate() {
+      const url = resolveUrl(input.value);
+      if (!url) return;
+      const encoded = __uv$config.encodeUrl(url);
+      setStatus('Opening…');
+      window.location.assign(__uv$config.prefix + encoded);
+    }
+
+    document.getElementById('search-btn').addEventListener('click', navigate);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') navigate(); });
+
+    (async () => {
+      if (!navigator.serviceWorker) {
+        document.getElementById('err-overlay').classList.add('show');
+        setStatus('Service workers not supported in this browser.', 'err');
+        return;
+      }
+
+      try {
+        setStatus('Initialising…');
+
+        // 1. Set up bare-mux transport → wisp server
+        const conn     = new BareMuxConnection('/baremux/worker.js');
+        const wispUrl  = (location.protocol === 'https:' ? 'wss' : 'ws') +
+                         '://' + location.host + '/wisp/';
+        await conn.setTransport('/epoxy/index.mjs', [{ wisp: wispUrl }]);
+
+        // 2. Register UV service worker
+        await navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/service/' });
+
+        setStatus('Ready', 'ok');
+        setTimeout(() => setStatus(''), 2000);
+      } catch (err) {
+        setStatus('Init failed: ' + err.message, 'err');
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>
