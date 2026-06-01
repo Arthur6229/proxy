@@ -9,6 +9,13 @@ const wisp       = require('wisp-server-node');
 const __dirname  = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+
+// Allow the UV service worker to claim the /service/ scope
+app.get('/uv/uv.sw.js', (req, res) => {
+  res.setHeader('Service-Worker-Allowed', '/');
+  res.sendFile(path.join(__dirname, 'public', 'uv', 'uv.sw.js'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (_req, res) =>
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
